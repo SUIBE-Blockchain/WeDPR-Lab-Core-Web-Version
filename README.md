@@ -1,3 +1,7 @@
+# WeDPR Lab Core Web Version
+
+WeDPR 的 Web 版本，基于 [Rocket](https://rocket.rs/) 框架。
+
 # 项目背景
 
 ![WeDPR](https://wedpr-lab.readthedocs.io/zh_CN/latest/_static/images/wedpr_logo.png)
