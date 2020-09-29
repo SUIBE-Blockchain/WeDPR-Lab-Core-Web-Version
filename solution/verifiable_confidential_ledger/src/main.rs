@@ -59,7 +59,9 @@ fn print_type_of<T>(_: &T) {
 fn make_credit(payload: Json<Value>) -> JsonValue {
     let (value_credit, value_secret) = vcl::make_credit(payload.value);
     let value_credit_str = wedpr_crypto::utils::point_to_string(&value_credit.get_point());
-    json!({ "status": "ok", "result":  {"credit": value_credit_str}})
+    let secret_blinding_str=scalar_to_string(&value_secret.secret_blinding);
+    json!({ "status": "ok", "result":  {"credit": value_credit_str,
+    "owner_secret":{"credit_value": value_secret.credit_value, "secret_blinding": secret_blinding_str}}})
 }
 
 #[post("/prove_range", format = "json", data = "<secrets>")]
