@@ -21,7 +21,7 @@ use verifiable_confidential_ledger::vcl;
 use wedpr_crypto::{
     self,
     constant::{BASEPOINT_G1, BASEPOINT_G2},
-    utils::{point_to_string, scalar_to_string,string_to_scalar},
+    utils::{point_to_string, string_to_point, scalar_to_string,string_to_scalar},
 };
 
 #[derive(Debug, PartialEq, Eq, Deserialize)]
@@ -39,6 +39,11 @@ pub struct Value{
     pub value: u64,
 }
 
+#[derive(Debug, PartialEq, Eq, Deserialize)]
+pub struct VerifyData{
+    pub credit: String,
+    pub proof: String
+}
 // The type to represent the ID of a message.
 type ID = usize;
 
@@ -74,6 +79,15 @@ fn prove_range(secrets: Json<Secrets>) -> JsonValue {
     let range_proof_c1 = vcl::prove_range(&owner_secret);
     println!("非负数的证明数据：\n{:?}", range_proof_c1);
     json!({ "status": "ok","result":  range_proof_c1})
+}
+
+#[post("/verify_range", format= "json", data = "<verify_data>")]
+fn verify_range(verify_data: Json<VerifyData>) -> JsonValue {
+    let confidential_credit = vcl::ConfidentialCredit{
+        point: string_to_point(&verify_data.credit).unwrap()
+    };
+    let meet_range_constraint = vcl::verify_range(&confidential_credit, &verify_data.proof);
+    json!({ "status": "ok", "result": meet_range_constraint})
 }
 
 // TODO: This example can be improved by using `route` with multiple HTTP verbs.
@@ -123,7 +137,7 @@ fn not_found() -> JsonValue {
 
 fn rocket() -> rocket::Rocket {
     rocket::ignite()
-        .mount("/vcl",routes![prove_range,make_credit])
+        .mount("/vcl",routes![prove_range,make_credit,verify_range])
         .mount("/message", routes![new, update, get])
         .register(catchers![not_found])
         .manage(Mutex::new(HashMap::<ID, String>::new()))

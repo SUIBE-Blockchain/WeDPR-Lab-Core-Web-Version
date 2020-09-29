@@ -21,7 +21,7 @@ pub struct OwnerSecret {
 /// Confidential credit record stored in VCL.
 #[derive(Default, Debug, Clone)]
 pub struct ConfidentialCredit {
-    point: RistrettoPoint,
+    pub point: RistrettoPoint,
 }
 
 impl fmt::Display for OwnerSecret {
