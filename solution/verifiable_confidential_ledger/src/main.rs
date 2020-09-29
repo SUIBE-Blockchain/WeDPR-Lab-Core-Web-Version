@@ -27,11 +27,16 @@ use wedpr_crypto::{
 #[derive(Debug, PartialEq, Eq, Deserialize)]
 pub struct Secrets{
     // c1: {
-        pub secret_blinding: String,
-        pub credit_value: u64,
+    pub secret_blinding: String,
+    pub credit_value: u64,
     // }
     // c2_secret: String,
     // c3_secret: String
+}
+
+#[derive(Debug, PartialEq, Eq, Deserialize)]
+pub struct Value{
+    pub value: u64,
 }
 
 // The type to represent the ID of a message.
@@ -48,6 +53,13 @@ struct Message {
 
 fn print_type_of<T>(_: &T) {
     println!("{}", std::any::type_name::<T>())
+}
+
+#[post("/make_credit", format = "json", data = "<payload>")]
+fn make_credit(payload: Json<Value>) -> JsonValue {
+    let (value_credit, value_secret) = vcl::make_credit(payload.value);
+    let value_credit_str = wedpr_crypto::utils::point_to_string(&value_credit.get_point());
+    json!({ "status": "ok", "result":  {"credit": value_credit_str}})
 }
 
 #[post("/prove_range", format = "json", data = "<secrets>")]
@@ -109,7 +121,7 @@ fn not_found() -> JsonValue {
 
 fn rocket() -> rocket::Rocket {
     rocket::ignite()
-        .mount("/vcl",routes![prove_range])
+        .mount("/vcl",routes![prove_range,make_credit])
         .mount("/message", routes![new, update, get])
         .register(catchers![not_found])
         .manage(Mutex::new(HashMap::<ID, String>::new()))
