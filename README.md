@@ -2,7 +2,62 @@
 
 WeDPR 的 Web 版本，基于 [Rocket](https://rocket.rs/) 框架。
 
-进度：[||_______                         2.5%                                     ]
+进度：[|||______                         10.0%                                  ]
+
+# 接口文档
+
+## 1 生成credit
+**url: /vcl/make_credit**
+
+method: post
+
+params: {value: 33}
+
+return: 
+
+{
+    "result": {
+        "credit": "Ln+bmZ50zCF5E2RfNKx0sHlFxiov1SMcQDqJfNDZv24=",
+        "owner_secret": {
+            "credit_value": 33,
+            "secret_blinding": "9GYl7egoXsQ5p4qkYJSqwQl0ggVs+4rEAiVmXTwvMgk="
+        }
+    },
+    "status": "ok"
+}
+
+## 2 非负证明
+
+**url: /vcl/prove_range**
+
+method: post
+
+params: 
+
+{ "credit_value": 33, "secret_blinding": "9GYl7egoXsQ5p4qkYJSqwQl0ggVs+4rEAiVmXTwvMgk="}
+
+return:
+
+{
+    "result": "MiU07ex8d29HRGM7UneuM8PuWRytgnQ3EsrILmarOAfgYKCN6lBeQYBEUe1Q+YXaoIMeXmW0uNSpzEndAsIVTS6iip2zPOzDRsKdXoFDAssO47rINcoPpofw6Nyy7vxOiE3F5iKzdhYiu8iTY+S/ZspALNuawnls3uG0VPouCQ/zjCnySH1GjstCi/JfpDdRghDchEz5e0ukKX2LhuueA10Vn2577H2bXIQeLTjvL4KbClOOMpA6seDCSScls34NdULbByQnmC2BHGhs/zZdF1ay67PWLGkVdjx9xLyiYAn8us9zsHs12nJEI9ntnYdPSxhPVM+szDICcPZr8OQCSGYvYRQQl28h1Og2HHc3ElMRJJoGAmX67zujHT7oecpZth2kTjV48LF/BhpDspC8WcZu4NqAKxYY9ww8dXcjGEsONCEtMwU28dTUaTAskWF7LdsUoE3ZGXYPlZjx5X7kX5SVT+UvZuTYv7Co6+ix9U4ZXXM2cecIvirUCLvvTh1iOpbUjiH1SxQm2zaZ1jKp91EUosuwZAD8cQUWiw8/JGn4TkMrqDqNdBUh9eTGy6Vg2rL5GM/09FCzh6q/Ukl1e+ynHYJPKuVEFvAQOoxX1ZyM0H94lyZAF29kX4QvXNwQ4vmyPGanFW1zcd0oiqbycCodETOyFhlSYeqp7yzbaAMWvOnBZ+j7ox4CYp53o8Fp8nYx9PrH5CVyIx4Kqz3pHwcN6kTsMDhHificj6krMfIgi6D8RGKX/820JzjenAwJ6NRhdh0JtMBrJBauVu0Ankhkv6GWgA1glWXiwAowbAY=",
+    "status": "ok"
+}
+
+
+**url: /vcl/verify_range**
+
+method: post
+
+params:
+
+{"credit": "aBHKbyCIImB2SwzRS6Tu7oEVQ5hVEg7RAzwlMyG3kjs=", "proof": "JJEBVu2fduiHFkVuv18/ZHDPvlf+rw17HAo0c8Hr9g98LXZygLZvVbrlZTf1mjKj3Wvqv0XIiyzZ3wU7fO/NF0RF/aDnl0XPFJABWsDceZXrOiTFsgDnYCFPCNPBugMuyimFf6fDnErUhj4/HaK/YcN/yHTV+5BD/o0szMY/0XD8CXda5s2Hgs0tp+YxPrBZlC5GOFubRxVOT+cDtwNLAZC+lScUcoJ1U98qVEDZu54bIeOU/H54uwxjgB5WHUgGyBKZmLehT6m+qTYdSRErEi1cFX60hhutnzGARTaVLAY0OmuIoC/Ttq5dxmNPRFly1d/tZp/holbqoUNGzv76Iyo2hqLTdofTISDVir4i88I8H+sdRFnlJANeUqvw430lbhJCFECPUkZkVqHr2h4ooJoaMZOb688wamge45IVIAFM+lxQUxkeididDvOLXVzFwxsv8gUDT76XxjkOPg6EcNJy4iY2pCnFlqWW3NiRELcJKPZlWv3a5iAOcJwFgBNATkIVzSKfYOaBXQtd3JXAguQxzyj7V52o9j7U0ZfoCG7IvXd7IMKAJehcpKmMR8aE0AGyCzk7ZIrEXU8sNrI3FTjByZSYFYM0IJi9Ms9LDqiFiNTwZ6I+9Uxn+oLvcrNUiJtbcRX6q/mJl+1UXpAlg3fIBie0Wjo/p82gpMQHXiNGtLBS/1VYBN4ByyY2iFS9AX8aDwQAzLMY2D1hCsw0Lp6J4GXBgEOzNfysfEzPEK45wseh6FpJuHD+ByhWvycHbZwToTghL5FxFaOg1xIkhRXM6I64gwymzhh0fK0JFQQ="}
+
+return: 
+
+{
+    "result": true,
+    "status": "ok"
+}
 
 # 项目背景
 
