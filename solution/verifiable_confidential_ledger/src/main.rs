@@ -24,6 +24,23 @@ use wedpr_crypto::{
     utils::{point_to_string, string_to_point, scalar_to_string,string_to_scalar},
 };
 
+// #[derive(Debug, PartialEq, Eq, Deserialize)]
+pub struct SumProof{
+    m1: String,
+    m2: String,
+    m3: String,
+    m4: String,
+    m5: String,
+}
+
+// #[derive(Debug, PartialEq, Eq, Deserialize)]
+pub struct VerifySumBalanceData{
+    c1_credit: String,
+    c2_credit: String,
+    c3_credit: String,
+    sum_proof: SumProof,
+}
+
 #[derive(Debug, PartialEq, Eq, Deserialize)]
 pub struct Secret{
     pub secret_blinding: String,
@@ -48,11 +65,6 @@ pub struct VerifyRangeData{
     pub proof: String
 }
 
-#[derive(Debug, PartialEq, Eq, Deserialize)]
-pub struct VerifySumBalanceData{
-    pub credit: String,
-    pub proof: String
-}
 // The type to represent the ID of a message.
 type ID = usize;
 
@@ -114,10 +126,10 @@ fn prove_range(secrets: Json<Secrets>) -> JsonValue {
     json!({ "status": "ok","result":  range_proof_c1})
 }
 
-#[post("verify_sum_balance",format = "json", data="<verify_sum_balance_data>")]
-fn verify_sum_balance(verify_sum_balance_data: Json<VerifySumBalanceData>) -> JsonValue {
-    
-}
+// #[post("verify_sum_balance",format = "json", data="<verify_sum_balance_data>")]
+// fn verify_sum_balance(verify_sum_balance_data: Json<VerifySumBalanceData>) -> JsonValue {
+
+// }
 
 #[post("/verify_range", format= "json", data = "<verify_range_data>")]
 fn verify_range(verify_range_data: Json<VerifyRangeData>) -> JsonValue {
