@@ -43,7 +43,13 @@ pub struct Value{
 }
 
 #[derive(Debug, PartialEq, Eq, Deserialize)]
-pub struct VerifyData{
+pub struct VerifyRangeData{
+    pub credit: String,
+    pub proof: String
+}
+
+#[derive(Debug, PartialEq, Eq, Deserialize)]
+pub struct VerifySumBalanceData{
     pub credit: String,
     pub proof: String
 }
@@ -84,34 +90,41 @@ fn str_to_secret(secret: &Secret) -> vcl::OwnerSecret {
 
 #[post("/prove_sum_balance", format = "json", data = "<secrets>")]
 fn prove_sum_balance(secrets: Json<Secrets>) -> JsonValue {
-    let c1_secret_blinding_scalar
-        =string_to_scalar(&secrets.c1.secret_blinding).unwrap();
-    let c2_secret_blinding_scalar
-        =string_to_scalar(&secrets.c1.secret_blinding).unwrap();
-
-    json!({ "status": "ok"})
+    let c1_secret = str_to_secret(&secrets.c1);
+    let c2_secret = str_to_secret(&secrets.c2);
+    let c3_secret = str_to_secret(&secrets.c3);
+    let sum_proof = vcl::prove_sum_balance(&c1_secret, &c2_secret, &c3_secret);
+    json!({"status": "ok", "result": 
+        {
+            "c": sum_proof.c,
+            "m1": sum_proof.m1,
+            "m2": sum_proof.m2,
+            "m3": sum_proof.m3,
+            "m4": sum_proof.m4,
+            "m5": sum_proof.m5
+        }
+    })
 }
+
 #[post("/prove_range", format = "json", data = "<secrets>")]
 fn prove_range(secrets: Json<Secrets>) -> JsonValue {
-    // let secret_blinding_scalar
-    //     =string_to_scalar(&secrets.c1.secret_blinding).unwrap();
-    // let owner_secret= vcl::OwnerSecret {
-    //     credit_value: secrets.c1.credit_value,
-    //     secret_blinding: secret_blinding_scalar,
-    // };
     let owner_secret = str_to_secret(&secrets.c1);
     let range_proof_c1 = vcl::prove_range(&owner_secret);
     println!("非负数的证明数据：\n{:?}", range_proof_c1);
     json!({ "status": "ok","result":  range_proof_c1})
 }
 
-// #[post("/prove_sum_balance", format = "json", data="<secrets>")]
-#[post("/verify_range", format= "json", data = "<verify_data>")]
-fn verify_range(verify_data: Json<VerifyData>) -> JsonValue {
+#[post("verify_sum_balance",format = "json", data="<verify_sum_balance_data>")]
+fn verify_sum_balance(verify_sum_balance_data: Json<VerifySumBalanceData>) -> JsonValue {
+    
+}
+
+#[post("/verify_range", format= "json", data = "<verify_range_data>")]
+fn verify_range(verify_range_data: Json<VerifyRangeData>) -> JsonValue {
     let confidential_credit = vcl::ConfidentialCredit{
-        point: string_to_point(&verify_data.credit).unwrap()
+        point: string_to_point(&verify_range_data.credit).unwrap()
     };
-    let meet_range_constraint = vcl::verify_range(&confidential_credit, &verify_data.proof);
+    let meet_range_constraint = vcl::verify_range(&confidential_credit, &verify_range_data.proof);
     json!({ "status": "ok", "result": meet_range_constraint})
 }
 
