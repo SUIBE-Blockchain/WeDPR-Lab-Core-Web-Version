@@ -25,13 +25,16 @@ use wedpr_crypto::{
 };
 
 #[derive(Debug, PartialEq, Eq, Deserialize)]
-pub struct Secrets{
-    // c1: {
+pub struct Secret{
     pub secret_blinding: String,
-    pub credit_value: u64,
-    // }
-    // c2_secret: String,
-    // c3_secret: String
+    pub credit_value: u64
+}
+
+#[derive(Debug, PartialEq, Eq, Deserialize)]
+pub struct Secrets{
+    c1: Secret,
+    c2: Secret,
+    c3: Secret,
 }
 
 #[derive(Debug, PartialEq, Eq, Deserialize)]
@@ -69,18 +72,40 @@ fn make_credit(payload: Json<Value>) -> JsonValue {
     "owner_secret":{"credit_value": value_secret.credit_value, "secret_blinding": secret_blinding_str}}})
 }
 
+fn str_to_secret(secret: &Secret) -> vcl::OwnerSecret {
+    let secret_blinding_scalar
+        =string_to_scalar(&secret.secret_blinding).unwrap();
+    vcl::OwnerSecret {
+        credit_value: secret.credit_value,
+        secret_blinding: secret_blinding_scalar,
+    }
+
+}
+
+#[post("/prove_sum_balance", format = "json", data = "<secrets>")]
+fn prove_sum_balance(secrets: Json<Secrets>) -> JsonValue {
+    let c1_secret_blinding_scalar
+        =string_to_scalar(&secrets.c1.secret_blinding).unwrap();
+    let c2_secret_blinding_scalar
+        =string_to_scalar(&secrets.c1.secret_blinding).unwrap();
+
+    json!({ "status": "ok"})
+}
 #[post("/prove_range", format = "json", data = "<secrets>")]
 fn prove_range(secrets: Json<Secrets>) -> JsonValue {
-    let secret_blinding_scalar=string_to_scalar(&secrets.secret_blinding).unwrap();
-    let owner_secret= vcl::OwnerSecret {
-        credit_value: secrets.credit_value,
-        secret_blinding: secret_blinding_scalar,
-    };
+    // let secret_blinding_scalar
+    //     =string_to_scalar(&secrets.c1.secret_blinding).unwrap();
+    // let owner_secret= vcl::OwnerSecret {
+    //     credit_value: secrets.c1.credit_value,
+    //     secret_blinding: secret_blinding_scalar,
+    // };
+    let owner_secret = str_to_secret(&secrets.c1);
     let range_proof_c1 = vcl::prove_range(&owner_secret);
     println!("非负数的证明数据：\n{:?}", range_proof_c1);
     json!({ "status": "ok","result":  range_proof_c1})
 }
 
+// #[post("/prove_sum_balance", format = "json", data="<secrets>")]
 #[post("/verify_range", format= "json", data = "<verify_data>")]
 fn verify_range(verify_data: Json<VerifyData>) -> JsonValue {
     let confidential_credit = vcl::ConfidentialCredit{
@@ -137,7 +162,7 @@ fn not_found() -> JsonValue {
 
 fn rocket() -> rocket::Rocket {
     rocket::ignite()
-        .mount("/vcl",routes![prove_range,make_credit,verify_range])
+        .mount("/vcl",routes![prove_range,make_credit,verify_range,prove_sum_balance])
         .mount("/message", routes![new, update, get])
         .register(catchers![not_found])
         .manage(Mutex::new(HashMap::<ID, String>::new()))
